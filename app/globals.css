@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --ink: #070707;
+  --panel: #111111;
+  --line: #252525;
+  --muted: #94989f;
+  --electric: #3a9bff;
+  --mint: #73f7bb;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--ink); }
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 82% -10%, rgba(58, 155, 255, .14), transparent 30rem),
+    radial-gradient(circle at 10% 18%, rgba(115, 247, 187, .05), transparent 22rem),
+    var(--ink);
+  color: #f4f5f6;
+  font-family: var(--font-geist), Arial, sans-serif;
+  min-height: 100vh;
+}
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+::selection { background: rgba(115, 247, 187, .24); color: #fff; }
+
+@layer components {
+  .eyebrow {
+    @apply text-[10px] font-semibold uppercase tracking-[0.22em] text-mint;
+  }
+  .surface {
+    @apply border border-line bg-panel/90 shadow-glow backdrop-blur;
+  }
+  .field {
+    @apply w-full rounded-xl border border-line bg-black/50 px-4 py-3.5 text-sm text-paper outline-none transition placeholder:text-[#686c72] focus:border-electric focus:ring-2 focus:ring-electric/20;
+  }
+  .primary-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-mint px-5 py-3.5 text-sm font-bold text-black transition hover:-translate-y-0.5 hover:bg-[#93ffca] focus:outline-none focus:ring-2 focus:ring-mint/50 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .ghost-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white/[0.03] px-4 py-3 text-sm font-semibold text-paper transition hover:border-[#484848] hover:bg-white/[0.07] focus:outline-none focus:ring-2 focus:ring-electric/40;
+  }
+}

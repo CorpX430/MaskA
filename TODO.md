@@ -1,0 +1,8 @@
+# Mask AI delivery TODO
+
+- [ ] **Public Mask AI landing page** — The public home page presents Mask AI as a mobile-first reply studio with the requested pure-black/dark-card visual system, electric blue and green accents, minimalist M/R-style mark, a clear sign-in path, and copy that positions the product as a tool for making the next reply count.
+- [ ] **Clerk authentication and protected routes** — Clerk wraps the application; email/password and Twitter/X OAuth can be configured in Clerk; `/dashboard` and `/api/generate` require a signed-in user; logged-out and signed-in navigation states are visible and usable.
+- [ ] **Mobile-first reply studio** — A signed-in user can provide either an optional post URL or pasted post text, choose exactly one reply style (insightful, bold, humorous, or professional), and enter an OpenRouter or Groq key in a password field that is kept only in current-session memory.
+- [ ] **Authenticated reply generation** — The server route accepts the source context, persona, and session key, detects `sk-or-` as OpenRouter and `gsk_` as Groq, calls the corresponding OpenAI-compatible endpoint with an appropriate model, and returns a natural reply under 280 characters with no hashtags.
+- [ ] **Reply handoff experience** — The dashboard shows loading and error states, renders the generated reply with its character count, supports copy-to-clipboard, opens an X intent URL, and makes clear that posting remains manual and no Twitter API is used.
+- [ ] **PWA and delivery setup** — The project includes `public/icon.svg`, `public/manifest.json`, `public/manus-routes.json`, a Clerk environment example, README setup instructions, a Render-ready Dockerfile, and project configuration for a durable logo URL.
