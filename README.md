@@ -17,15 +17,16 @@ The OpenRouter/Groq key is intentionally entered in the dashboard and is not wri
 
 ## GitHub and Render
 
-The managed Webdev project is prepared for a GitHub canonical repository. Connect it from the project’s Git configuration flow so the authorized private repository becomes the project source. For Render, create a Web Service from the repository, use the included `Dockerfile`, and set the start command to `npm start` if Render asks for one. Add `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/`, and `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/` as Render environment variables. Render should expose port `3000`.
+The managed Webdev project is connected to the public GitHub repository `CorpX430/MaskA` on `main`. Render service setup uses the included `Dockerfile`, auto-deploys from `main`, and exposes `/api/health` for readiness. In Render, set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`, and `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`. The non-public `CLERK_PUBLISHABLE_KEY` alias is used at runtime so a Docker build does not need to inline a browser key.
 
-For Clerk, set the local and Render domains in Clerk’s allowed origins/redirect URLs. Enable Twitter/X in the Clerk dashboard; the app does not call the Twitter API and only uses Clerk for sign-in.
+For Clerk, set the local, Render, and preview domains in Clerk’s allowed origins/redirect URLs. Enable Twitter/X in the Clerk dashboard; the app does not call the Twitter API and only uses Clerk for sign-in.
 
 ## Routes
 
 - `/` — public landing page
 - `/dashboard` — protected reply studio
 - `/api/generate` — authenticated POST endpoint
+- `/api/health` — unauthenticated Render readiness endpoint
 
 ## Security notes
 

@@ -7,6 +7,8 @@ services:
     envVars:
       - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
         sync: false
+      - key: CLERK_PUBLISHABLE_KEY
+        sync: false
       - key: CLERK_SECRET_KEY
         sync: false
       - key: NEXT_PUBLIC_CLERK_SIGN_IN_URL

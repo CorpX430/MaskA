@@ -17,11 +17,10 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <ClerkProvider>
-      <html lang="en">
-        <body>{children}</body>
-      </html>
-    </ClerkProvider>
-  );
+  // Render uses the non-public alias at runtime so the Docker build does not need
+  // to expose a browser key. Local and managed Preview continue using NEXT_PUBLIC_….
+  const publishableKey = process.env.CLERK_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const content = <html lang="en"><body>{children}</body></html>;
+
+  return publishableKey ? <ClerkProvider publishableKey={publishableKey}>{content}</ClerkProvider> : content;
 }
