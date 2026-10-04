@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { UserButton, useUser } from '@clerk/nextjs';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import ReplyOutput from '@/app/components/ReplyOutput';
+import { DEFAULT_OPENROUTER_MODEL, OPENROUTER_MODEL_OPTIONS } from '@/app/utils/modelCatalog';
 
 type Persona = 'insightful' | 'bold' | 'humorous' | 'professional';
 type HistoryItem = { id: string; tweetText: string; persona: string; reply: string; createdAt: string };
@@ -30,6 +31,7 @@ export default function Dashboard() {
   const [tweetUrl, setTweetUrl] = useState('');
   const [tweetText, setTweetText] = useState('');
   const [persona, setPersona] = useState<Persona>('insightful');
+  const [model, setModel] = useState(DEFAULT_OPENROUTER_MODEL);
   const [reply, setReply] = useState('');
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [error, setError] = useState('');
@@ -61,7 +63,7 @@ export default function Dashboard() {
     if (!tweetUrl.trim() && !tweetText.trim()) return setError('Add a post URL or paste the post text first.');
     setLoading(true); setError(''); setReply('');
     try {
-      const response = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweetUrl, tweetText, persona }) });
+      const response = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tweetUrl, tweetText, persona, model }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Unable to generate a reply.');
       setReply(data.reply);
@@ -99,6 +101,8 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-2">
               {personas.map((item) => <button type="button" key={item.value} onClick={() => choosePersona(item.value)} className={`rounded-xl border p-3 text-left transition ${persona === item.value ? 'border-mint bg-mint/[0.08] shadow-[0_0_0_1px_rgba(115,247,187,.12)]' : 'border-line bg-black/20 hover:border-[#444]'}`}><span className={`mb-4 grid h-7 w-7 place-items-center rounded-lg text-xs font-bold ${persona === item.value ? 'bg-mint text-black' : 'bg-white/[0.08] text-muted'}`}>{item.accent}</span><span className="block text-xs font-semibold text-paper">{item.label}</span><span className="mt-1 block text-[10px] leading-4 text-muted">{item.detail}</span></button>)}
             </div>
+
+            <label className="mt-4 block"><span className="mb-2 flex items-center justify-between text-xs font-semibold text-paper"><span>Model instrument</span><span className="font-normal text-muted">Switch anytime</span></span><select className="field" value={model} onChange={(event) => setModel(event.target.value)}>{OPENROUTER_MODEL_OPTIONS.map((option) => <option key={option.id} value={option.id}>{option.label} — {option.detail}</option>)}</select></label>
 
             <div className="my-6 h-px bg-line" />
             <div className="mb-4 flex items-center justify-between"><div><p className="eyebrow text-electric">Draft securely</p><p className="mt-1 text-xs text-muted">History is private to your account</p></div><span className="font-mono text-[10px] text-muted">03 / 03</span></div>

@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { getOpenRouterClient, getOpenRouterModel } from '@/app/utils/llmClient';
+import { getOpenRouterClient, getRequestedModel } from '@/app/utils/llmClient';
 import { getPrisma } from '@/app/utils/prisma';
 
 export const runtime = 'nodejs';
@@ -17,7 +17,7 @@ const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 8;
 const requestHistory = new Map<string, number[]>();
 
-type GenerateRequest = { tweetUrl?: unknown; tweetText?: unknown; persona?: unknown };
+type GenerateRequest = { tweetUrl?: unknown; tweetText?: unknown; persona?: unknown; model?: unknown };
 
 function readString(value: unknown, maxLength: number) {
   return typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
@@ -65,6 +65,7 @@ export async function POST(request: Request) {
   const tweetUrl = readString(body.tweetUrl, 2_000);
   const tweetText = readString(body.tweetText, 2_000);
   const persona = typeof body.persona === 'string' && body.persona in personaInstructions ? body.persona : 'insightful';
+  const model = getRequestedModel(body.model);
   if (!tweetUrl && !tweetText) return NextResponse.json({ error: 'Add a post URL or paste the post text first.' }, { status: 400 });
 
   const client = getOpenRouterClient();
@@ -77,7 +78,7 @@ export async function POST(request: Request) {
   try {
     const completion = await client.chat.send({
       chatRequest: {
-        model: getOpenRouterModel(),
+        model,
         messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: context }],
         maxCompletionTokens: 110,
         reasoningEffort: 'minimal',
@@ -96,7 +97,7 @@ export async function POST(request: Request) {
     if (prisma) {
       try {
         await Promise.all([
-          prisma.generation.create({ data: { clerkUserId: userId, tweetUrl: tweetUrl || null, tweetText: tweetText || '(URL only)', persona, reply, model: getOpenRouterModel() } }),
+          prisma.generation.create({ data: { clerkUserId: userId, tweetUrl: tweetUrl || null, tweetText: tweetText || '(URL only)', persona, reply, model } }),
           prisma.userPreference.upsert({ where: { clerkUserId: userId }, create: { clerkUserId: userId, defaultPersona: persona }, update: { defaultPersona: persona } }),
         ]);
       } catch {

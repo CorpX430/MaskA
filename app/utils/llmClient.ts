@@ -1,6 +1,6 @@
 import { OpenRouter } from '@openrouter/sdk';
-
-export const DEFAULT_OPENROUTER_MODEL = 'google/gemini-3.1-flash-lite';
+import { DEFAULT_OPENROUTER_MODEL, OPENROUTER_MODEL_OPTIONS } from '@/app/utils/modelCatalog';
+export { DEFAULT_OPENROUTER_MODEL } from '@/app/utils/modelCatalog';
 
 /**
  * Creates a server-only OpenRouter client. The key is deliberately read only
@@ -20,4 +20,9 @@ export function getOpenRouterClient() {
 
 export function getOpenRouterModel() {
   return process.env.OPENROUTER_MODEL?.trim() || DEFAULT_OPENROUTER_MODEL;
+}
+
+export function getRequestedModel(value: unknown) {
+  if (typeof value === 'string' && OPENROUTER_MODEL_OPTIONS.some((model) => model.id === value)) return value;
+  return getOpenRouterModel();
 }
