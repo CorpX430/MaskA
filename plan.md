@@ -22,21 +22,24 @@ Mask AI is a mobile-first reply studio for creators who want to turn a public po
 ## Implementation
 
 - Next.js App Router with TypeScript and Tailwind CSS.
-- Clerk wraps the app; `/dashboard` is protected by Clerk middleware, and `/api/generate` performs a second server-side user check.
+- Clerk wraps the app; `/dashboard` is protected by the Next.js proxy, and API routes perform server-side user checks.
 - OpenRouter is integrated through its official TypeScript SDK. `OPENROUTER_API_KEY` exists only on the server; browser requests never contain a model key.
-- The generation route validates and bounds all input, hashes the Clerk user ID before sharing it with OpenRouter for provider-side abuse isolation, limits generation bursts per user, returns sanitized replies under 280 characters, and does not expose provider error payloads.
+- Prisma 6 and PostgreSQL persist generation history and the user’s default voice. Database failures are isolated so AI drafting can still respond while persistence is unavailable.
+- The generation route validates and bounds input, hashes the Clerk user ID before sharing it with OpenRouter for provider-side abuse isolation, limits bursts per user, returns sanitized replies under 280 characters, and does not expose provider error payloads.
 - Static PWA metadata lives in `public/manifest.json`, `public/icon.svg`, and `public/manus-routes.json`.
-- A Dockerfile and Render declaration support build, health check, and auto-deploy from `main`.
+- A Dockerfile and Render declaration support build, health check, migration, and auto-deploy from `main`.
 
 ## Project structure
 
 - `app/page.tsx`: public landing page and signed-in entry state.
 - `app/dashboard/page.tsx`: dynamic authenticated dashboard entry.
-- `app/dashboard/DashboardClient.tsx`: interactive reply workspace.
-- `app/components/*`: generated reply and loading-state UI.
-- `app/api/generate/route.ts`: authenticated and rate-limited OpenRouter endpoint.
+- `app/dashboard/DashboardClient.tsx`: reply workspace, saved voice selection, and history library.
+- `app/api/generate/route.ts`: authenticated and rate-limited OpenRouter endpoint with persistence.
+- `app/api/history/route.ts`: authenticated recent-history endpoint.
+- `app/api/preferences/route.ts`: authenticated preference read/write endpoint.
 - `app/api/health/route.ts`: Render readiness endpoint.
 - `app/utils/llmClient.ts`: server-only OpenRouter SDK factory and model configuration.
-- `app/globals.css`: visual system and utility styles.
+- `app/utils/prisma.ts`: singleton Prisma client with graceful no-database fallback.
+- `prisma/schema.prisma` and `prisma/migrations/*`: PostgreSQL data model and migration.
 - `public/*`: app icon, PWA manifest, and route manifest.
-- `Dockerfile` and `render.yaml`: Render container and environment declarations.
+- `Dockerfile` and `render.yaml`: Render container, database link, and environment declarations.

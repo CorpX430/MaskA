@@ -1,0 +1,8 @@
+import { PrismaClient } from '@prisma/client';
+
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+
+export function getPrisma() {
+  if (!process.env.DATABASE_URL) return null;
+  return globalForPrisma.prisma || (globalForPrisma.prisma = new PrismaClient());
+}

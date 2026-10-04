@@ -8,6 +8,7 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN npx prisma generate
 RUN npm run build
 
 FROM node:20-alpine AS runner
@@ -17,4 +18,4 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 COPY --from=builder /app ./
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["sh", "-c", "if [ -n \"$DATABASE_URL\" ]; then npx prisma migrate deploy; fi; npm start"]
