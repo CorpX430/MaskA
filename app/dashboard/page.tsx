@@ -7,6 +7,9 @@ import { UserButton, useUser } from '@clerk/nextjs';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import ReplyOutput from '@/app/components/ReplyOutput';
 
+// Clerk is optional during the Docker build; evaluate this protected client page only at runtime.
+export const dynamic = 'force-dynamic';
+
 type Persona = 'insightful' | 'bold' | 'humorous' | 'professional';
 
 const personas: { value: Persona; label: string; detail: string; accent: string }[] = [
