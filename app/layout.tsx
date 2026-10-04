@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Mask AI — Make the next reply count',
   description: 'A sharper reply before your next scroll.',
@@ -17,10 +19,11 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // Render uses the non-public alias at runtime so the Docker build does not need
-  // to expose a browser key. Local and managed Preview continue using NEXT_PUBLIC_….
+  // A runtime value keeps the publishable key out of the Docker build image.
   const publishableKey = process.env.CLERK_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   const content = <html lang="en"><body>{children}</body></html>;
 
-  return publishableKey ? <ClerkProvider publishableKey={publishableKey}>{content}</ClerkProvider> : content;
+  return publishableKey && process.env.CLERK_SECRET_KEY
+    ? <ClerkProvider publishableKey={publishableKey}>{content}</ClerkProvider>
+    : content;
 }

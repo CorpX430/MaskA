@@ -1,21 +1,23 @@
-import OpenAI from 'openai';
+import { OpenRouter } from '@openrouter/sdk';
 
-export type Provider = 'openrouter' | 'groq';
+export const DEFAULT_OPENROUTER_MODEL = 'google/gemini-3.1-flash-lite';
 
-export function detectProvider(apiKey: string): Provider {
-  if (apiKey.startsWith('sk-or-')) return 'openrouter';
-  if (apiKey.startsWith('gsk_')) return 'groq';
-  throw new Error('Unsupported key. Use an OpenRouter key (sk-or-…) or Groq key (gsk_…).');
+/**
+ * Creates a server-only OpenRouter client. The key is deliberately read only
+ * from the runtime environment and is never passed to a browser client.
+ */
+export function getOpenRouterClient() {
+  const apiKey = process.env.OPENROUTER_API_KEY?.trim();
+  if (!apiKey) return null;
+
+  return new OpenRouter({
+    apiKey,
+    appTitle: 'Mask AI',
+    httpReferer: process.env.APP_URL?.trim() || 'https://mask-ai-6sio.onrender.com',
+    timeoutMs: 25_000,
+  });
 }
 
-export function createLLMClient(apiKey: string) {
-  const provider = detectProvider(apiKey);
-  return {
-    provider,
-    client: new OpenAI({
-      apiKey,
-      baseURL: provider === 'openrouter' ? 'https://openrouter.ai/api/v1' : 'https://api.groq.com/openai/v1',
-      defaultHeaders: provider === 'openrouter' ? { 'HTTP-Referer': 'https://mask-ai.app', 'X-Title': 'Mask AI' } : undefined,
-    }),
-  };
+export function getOpenRouterModel() {
+  return process.env.OPENROUTER_MODEL?.trim() || DEFAULT_OPENROUTER_MODEL;
 }
